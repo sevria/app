@@ -14,6 +14,6 @@
 
 	<p class="text-foreground-muted">
 		Don't have an account?
-		<Link href="#register">Sign up</Link>
+		<Link href="#">Sign up</Link>
 	</p>
 </div>
