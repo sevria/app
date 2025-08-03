@@ -54,11 +54,12 @@ jobs:
       - name: Create Dockerfile
         run: |
           cat <<EOT > Dockerfile
-          FROM busybox:1.36.1
+          FROM gcr.io/distroless/nodejs22-debian12
           WORKDIR /runtime
-          COPY build .
+          COPY ./build ./build
+          COPY ./package.json ./package.json
           EXPOSE 3000
-          CMD ["busybox", "httpd", "-f", "-p", "3000"]
+          CMD ["build"]
           EOT
 
       - name: Build and push Docker image
