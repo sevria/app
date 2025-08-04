@@ -51,17 +51,6 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
 
-      - name: Create Dockerfile
-        run: |
-          cat <<EOT > Dockerfile
-          FROM gcr.io/distroless/nodejs22-debian12
-          WORKDIR /runtime
-          COPY ./build ./build
-          COPY ./package.json ./package.json
-          EXPOSE 3000
-          CMD ["build"]
-          EOT
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:

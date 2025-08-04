@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { env } from '$env/dynamic/public';
 	import Spinner from '$lib/Spinner.svelte';
 	import { Provider } from '@sevria/ui';
 	import '@sevria/ui/styles.css';
@@ -8,7 +8,10 @@
 	import { fade } from 'svelte/transition';
 	import wait from 'wait';
 
-	axios.defaults.baseURL = env.PUBLIC_API_URL;
+	if (browser) {
+		// @ts-ignore
+		axios.defaults.baseURL = window.env.PUBLIC_API_URL;
+	}
 
 	let loading = $state(true);
 
