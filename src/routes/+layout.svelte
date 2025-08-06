@@ -1,26 +1,41 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import type { User } from '$lib/types';
 	import Spinner from '$lib/Spinner.svelte';
 	import { Provider } from '@sevria/ui';
 	import '@sevria/ui/styles.css';
-	import axios from 'axios';
+	import Cookies from 'js-cookie';
 	import { fade } from 'svelte/transition';
 	import wait from 'wait';
 
-	if (browser) {
-		// @ts-ignore
-		axios.defaults.baseURL = window.env.PUBLIC_API_URL;
-	}
-
 	let loading = $state(true);
+	let user = $state<User | null>(null);
 
 	let { children } = $props();
 
 	$effect(() => {
 		(async () => {
-			await wait(1000);
-			await goto('/auth/login');
+			await wait(300);
+
+			const userJSON = Cookies.get('SUS');
+
+			if (userJSON) {
+				try {
+					user = JSON.parse(userJSON);
+
+					if (window.location.pathname.startsWith('/auth')) {
+						await goto('/');
+					}
+
+					loading = false;
+					return;
+				} catch (error) {}
+			}
+
+			if (!window.location.pathname.startsWith('/auth')) {
+				await goto('/auth/login');
+			}
+
 			loading = false;
 		})();
 	});
