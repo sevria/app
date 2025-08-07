@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { api } from '$lib';
-	import { Button, Input, Link } from '@sevria/ui';
-	import Cookies from 'js-cookie';
+	import { api, api2, login } from '$lib/api';
+	import { Button, Input, Link, toast } from '@sevria/ui';
 	import { createForm } from 'felte';
+	import Cookies from 'js-cookie';
+	import type { ApiResponse, FetchReturnType } from 'openapi-typescript-fetch';
 	import wait from 'wait';
 
 	const { form, isSubmitting } = createForm({
@@ -13,27 +14,32 @@
 		onSubmit: async (values) => {
 			await wait(300);
 
-			const { data, error } = await api.POST('/auth/login', { body: values });
-
-			if (error) {
-				console.log(error);
+			let res: ApiResponse<FetchReturnType<typeof login>>;
+			try {
+				res = await login(values);
+			} catch (err: any) {
+				if (err instanceof login.Error) {
+					toast.error(err.data.message);
+				} else {
+					toast.error(err.message);
+				}
 				return;
 			}
 
-			Cookies.set('SAT', data.access.token, {
-				expires: new Date(data.access.expires_at),
+			Cookies.set('SAT', res!.data.access.token, {
+				expires: new Date(res!.data.access.expires_at),
 				sameSite: 'strict',
 				secure: window.location.protocol === 'https:'
 			});
 
-			Cookies.set('SRT', data.refresh.token, {
-				expires: new Date(data.refresh.expires_at),
+			Cookies.set('SRT', res!.data.refresh.token, {
+				expires: new Date(res!.data.refresh.expires_at),
 				sameSite: 'strict',
 				secure: window.location.protocol === 'https:'
 			});
 
-			Cookies.set('SUS', JSON.stringify(data.user), {
-				expires: new Date(data.refresh.expires_at),
+			Cookies.set('SUS', JSON.stringify(res!.data.user), {
+				expires: new Date(res!.data.refresh.expires_at),
 				sameSite: 'strict',
 				secure: window.location.protocol === 'https:'
 			});
