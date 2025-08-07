@@ -7,6 +7,7 @@
 	import Cookies from 'js-cookie';
 	import { fade } from 'svelte/transition';
 	import wait from 'wait';
+	import { twJoin } from 'tailwind-merge';
 
 	let loading = $state(true);
 	let user = $state<User | null>(null);
@@ -15,7 +16,7 @@
 
 	$effect(() => {
 		(async () => {
-			await wait(300);
+			await wait(500);
 
 			const userJSON = Cookies.get('SUS');
 
@@ -51,5 +52,7 @@
 		</div>
 	{/if}
 
-	{@render children()}
+	<div class={twJoin('transition-opacity duration-200', loading ? 'opacity-0' : 'opacity-100')}>
+		{@render children()}
+	</div>
 </Provider>
